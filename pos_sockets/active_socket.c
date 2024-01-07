@@ -127,7 +127,8 @@ void active_socket_start_reading(struct active_socket* self) {
 void active_socket_write_data(struct active_socket* self, struct char_buffer* message) {
     pthread_mutex_lock(&self->mutex_writing);
     write(self->socket_descriptor, message->data, message->size);
-    write(self->socket_descriptor, SOCKET_TERMINATE_CHAR, sizeof(SOCKET_TERMINATE_CHAR));
+    char end_char = SOCKET_TERMINATE_CHAR;
+    write(self->socket_descriptor, &end_char, sizeof(end_char));
     pthread_mutex_unlock(&self->mutex_writing);
 }
 
