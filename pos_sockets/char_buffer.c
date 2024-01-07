@@ -8,6 +8,13 @@ void char_buffer_init(struct char_buffer* buf) {
     buf->data = calloc(buf->capacity, sizeof(char));
 }
 
+void char_buffer_init_custom(struct char_buffer* buf, size_t capacity_p) {
+    buf->capacity = capacity_p;
+    buf->size = 0;
+    buf->data = calloc(buf->capacity, sizeof(char));
+}
+
+
 void char_buffer_init_copy(struct char_buffer* buf, const struct char_buffer* other) {
     buf->capacity = other->capacity;
     buf->size = other->size;
