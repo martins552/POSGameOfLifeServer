@@ -38,7 +38,7 @@ _Bool world_state_try_deserialize(struct char_buffer* buf) {
     char* delimiter_position = strchr(buf->data, '\n');
     if(delimiter_position != NULL)
     {
-        int file_name_length = (int)(delimiter_position - buf->data[1]);
+        int file_name_length = (int)(delimiter_position - &buf->data[1]);
         if(file_name_length == 0) {
             printf("Klient poslal prázdny názov súboru\ndata: %s\n", buf->data);
             return false;
@@ -76,7 +76,7 @@ _Bool send_world_state_to_client(struct char_buffer* buf, struct active_socket* 
     char* delimiter_position = strchr(buf->data, '\n');
     if(delimiter_position != NULL)
     {
-        int file_name_length = (int)(delimiter_position - buf->data[1]);
+        int file_name_length = (int)(delimiter_position - &buf->data[1]);
         if(file_name_length == 0) {
             printf("Klient poslal prázdny názov súboru\ndata: %s\n", buf->data);
             return false;
