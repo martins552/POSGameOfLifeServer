@@ -112,10 +112,10 @@ _Bool send_world_state_to_client(struct char_buffer* buf, struct active_socket* 
 
 _Bool determine_client_input(struct char_buffer* buf, struct active_socket* client_sock) {
     char determinant = buf->data[0];
-    if(determinant == 'r')
+    if(determinant == 'w')
     {
         return world_state_try_deserialize(buf);
-    } else if(determinant == 'w')
+    } else if(determinant == 'r')
     {
         return send_world_state_to_client(buf, client_sock);
     } else
