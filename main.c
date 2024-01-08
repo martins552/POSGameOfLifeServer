@@ -102,6 +102,7 @@ _Bool send_world_state_to_client(struct char_buffer* buf, struct active_socket* 
 
             active_socket_write_data(client_sock, &buffer);
             fclose(world_state_file);
+            char_buffer_destroy(&buffer);
             return true;
         }
     }
