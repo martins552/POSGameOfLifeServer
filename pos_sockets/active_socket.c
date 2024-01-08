@@ -65,7 +65,7 @@ _Bool active_socket_is_end_message(struct active_socket* self, struct char_buffe
 }
 
 void active_socket_start_reading(struct active_socket* self) {
-#define BUFFER_LENGTH 100
+#define BUFFER_LENGTH 5000
 
     pthread_mutex_lock(&self->mutex_reading);
     if (self->is_reading) {
