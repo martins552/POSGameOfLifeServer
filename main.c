@@ -18,18 +18,38 @@ typedef struct world_state {
     char* world;
 } WORLD_STATE_DATA;
 
-//TODO
-///UNFINISHED!!!
 _Bool world_state_try_deserialize(struct world_state* worldState, struct char_buffer* buf) {
-    char *pos = strchr(buf->data, ';');
-    if(pos != NULL) {
-        pos = strchr(pos+1, ';')+1;
-        sscanf(buf->data, "%ld;%ld;");
-        return true;
+    char* delimiter_position = strchr(buf->data, '\n');
+    if(delimiter_position != NULL)
+    {
+        int file_name_length = (int)(delimiter_position - buf->data[1]);
+        if(file_name_length == 0) {
+            printf("Klient poslal prázdny názov súboru\ndata: %s\n", buf->data);
+            return false;
+        }
+        char file_name[file_name_length + 1];
+        strncpy(file_name, &buf->data[1], file_name_length);
+        file_name[file_name_length] = '\0';
+
+        FILE* world_state_file = fopen(file_name, "w");
+        if(world_state_file != NULL)
+        {
+            char* previous_delimiter_position = delimiter_position;
+            delimiter_position = strchr(previous_delimiter_position + 1, '\n');
+            while(delimiter_position != NULL) {
+                int line_length = (int)(delimiter_position - previous_delimiter_position);
+                char string_to_write[line_length + 1];
+                strncpy(string_to_write, previous_delimiter_position + 1, line_length);
+                fprintf(world_state_file, "%s", string_to_write);
+
+                previous_delimiter_position = delimiter_position;
+                delimiter_position = strchr(previous_delimiter_position + 1, '\n');
+            }
+            fclose(world_state_file);
+            return true;
+        }
     }
-    else {
-        return false;
-    }
+    return false;
 }
 
 _Bool send_world_state_to_client(struct char_buffer* buf, struct active_socket* client_sock) {
@@ -61,6 +81,7 @@ _Bool send_world_state_to_client(struct char_buffer* buf, struct active_socket* 
             }
             active_socket_write_data(client_sock, &buffer);
             active_socket_write_end_message(client_sock);
+            fclose(world_state_file);
             return true;
         }
     }
