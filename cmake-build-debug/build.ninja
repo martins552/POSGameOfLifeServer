@@ -83,7 +83,7 @@ build CMakeFiles/POSGameOfLifeServer.dir/pos_sockets/active_socket.c.obj: C_COMP
 
 build POSGameOfLifeServer.exe: C_EXECUTABLE_LINKER__POSGameOfLifeServer_Debug CMakeFiles/POSGameOfLifeServer.dir/main.c.obj CMakeFiles/POSGameOfLifeServer.dir/pos_sockets/passive_socket.c.obj CMakeFiles/POSGameOfLifeServer.dir/pos_sockets/char_buffer.c.obj CMakeFiles/POSGameOfLifeServer.dir/pos_sockets/active_socket.c.obj
   FLAGS = -g
-  LINK_LIBRARIES = -lpthread.h  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
+  LINK_LIBRARIES = -lpthread  -lkernel32 -luser32 -lgdi32 -lwinspool -lshell32 -lole32 -loleaut32 -luuid -lcomdlg32 -ladvapi32
   OBJECT_DIR = CMakeFiles\POSGameOfLifeServer.dir
   POST_BUILD = cd .
   PRE_LINK = cd .
