@@ -44,6 +44,9 @@ _Bool world_state_try_deserialize(struct char_buffer* buf) {
                 fprintf(world_state_file, "%s", string_to_write);
 
                 previous_delimiter_position = delimiter_position;
+                if(&buf->data[buf->size - 1] == previous_delimiter_position) {
+                    break;
+                }
                 delimiter_position = strchr(previous_delimiter_position + 1, '\n');
             }
             fclose(world_state_file);
