@@ -148,7 +148,7 @@ _Bool try_get_client_data(struct active_socket* my_sock) {
         if(r_buf.size > 0) {
             if(active_socket_is_end_message(my_sock, &r_buf)) {
                 active_socket_stop_reading(my_sock);
-            } else if (world_state_try_deserialize(&r_buf)) {
+            } else if (determine_client_input(&r_buf, my_sock)) {
                 result = true;
             } else {
                 printf("Klient poslal spravu v zlom formate\ndata: %s\n", r_buf.data);
