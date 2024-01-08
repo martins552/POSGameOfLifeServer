@@ -104,6 +104,15 @@ _Bool send_world_state_to_client(struct char_buffer* buf, struct active_socket* 
             fclose(world_state_file);
             char_buffer_destroy(&buffer);
             return true;
+        } else {
+            CHAR_BUFFER buffer;
+            char_buffer_init_custom(&buffer, 1);
+
+            char newline = '\n';
+            char_buffer_append(&buffer, &newline, 1);
+            active_socket_write_data(client_sock, &buffer);
+
+            char_buffer_destroy(&buffer);
         }
     }
     return false;
