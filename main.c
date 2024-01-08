@@ -9,6 +9,7 @@
 #include "pos_sockets/active_socket.h"
 #include "pos_sockets/passive_socket.h"
 #include <sys/stat.h>
+#include <unistd.h>
 
 
 //TODO zmeniť char_buffer length, aby sme zmestili doň naše dáta (svet aj názov súboru)
@@ -17,6 +18,21 @@ typedef struct world_state {
     char* file_name;
     char* world;
 } WORLD_STATE_DATA;
+
+typedef struct thread_data {
+    short port;
+    ACTIVE_SOCKET* my_socket;
+} THREAD_DATA;
+
+void thread_data_init(struct thread_data* data, short port, ACTIVE_SOCKET* my_socket) {
+    data->port = port;
+    data->my_socket = my_socket;
+}
+
+void thread_data_destroy(struct thread_data* data) {
+    data->port = 0;
+    data->my_socket = NULL;
+}
 
 _Bool world_state_try_deserialize(struct char_buffer* buf) {
     char* delimiter_position = strchr(buf->data, '\n');
@@ -110,7 +126,21 @@ _Bool determine_client_input(struct char_buffer* buf, struct active_socket* clie
     return false;
 }
 
-_Bool try_get_client(struct active_socket* my_sock, struct pi_estimation* client_pi_estimaton) {
+void* process_client_data(void* thread_data) {
+    THREAD_DATA *data = (THREAD_DATA *)thread_data;
+    PASSIVE_SOCKET p_socket;
+    passive_socket_init(&p_socket);
+    passive_socket_start_listening(&p_socket, data->port);
+    passive_socket_wait_for_client(&p_socket, data->my_socket);
+    passive_socket_stop_listening(&p_socket);
+    passive_socket_destroy(&p_socket);
+
+    printf("connected\n");
+    active_socket_start_reading(data->my_socket);
+    return NULL;
+}
+
+_Bool try_get_client_data(struct active_socket* my_sock) {
     _Bool result = false;
     CHAR_BUFFER r_buf;
     char_buffer_init(&r_buf);
@@ -131,6 +161,22 @@ _Bool try_get_client(struct active_socket* my_sock, struct pi_estimation* client
 }
 
 int main() {
-    printf("Hello, World!\n");
+    pthread_t th_receive;
+    struct active_socket socket;
+    struct thread_data data;
+    active_socket_init(&socket);
+    thread_data_init(&data,18235 ,&socket);
+
+    pthread_create(&th_receive, NULL, process_client_data, &data);
+
+    while(true) {
+        try_get_client_data(&socket);
+        usleep(100);
+    }
+
+    pthread_join(th_receive, NULL);
+
+    thread_data_destroy(&data);
+    active_socket_destroy(&socket);
     return 0;
 }
