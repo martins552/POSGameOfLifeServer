@@ -134,16 +134,18 @@ _Bool determine_client_input(struct char_buffer* buf, struct active_socket* clie
 }
 
 void* process_client_data(void* thread_data) {
-    THREAD_DATA *data = (THREAD_DATA *)thread_data;
-    PASSIVE_SOCKET p_socket;
-    passive_socket_init(&p_socket);
-    passive_socket_start_listening(&p_socket, data->port);
-    passive_socket_wait_for_client(&p_socket, data->my_socket);
-    passive_socket_stop_listening(&p_socket);
-    passive_socket_destroy(&p_socket);
+    while(true) {
+        THREAD_DATA *data = (THREAD_DATA *) thread_data;
+        PASSIVE_SOCKET p_socket;
+        passive_socket_init(&p_socket);
+        passive_socket_start_listening(&p_socket, data->port);
+        passive_socket_wait_for_client(&p_socket, data->my_socket);
+        passive_socket_stop_listening(&p_socket);
+        passive_socket_destroy(&p_socket);
 
-    printf("connected\n");
-    active_socket_start_reading(data->my_socket);
+        printf("connected\n");
+        active_socket_start_reading(data->my_socket);
+    }
     return NULL;
 }
 
