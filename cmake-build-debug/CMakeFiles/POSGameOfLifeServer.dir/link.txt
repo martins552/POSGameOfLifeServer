@@ -1,0 +1,1 @@
+/usr/bin/cc -g CMakeFiles/POSGameOfLifeServer.dir/main.c.o CMakeFiles/POSGameOfLifeServer.dir/pos_sockets/passive_socket.c.o CMakeFiles/POSGameOfLifeServer.dir/pos_sockets/char_buffer.c.o CMakeFiles/POSGameOfLifeServer.dir/pos_sockets/active_socket.c.o -o POSGameOfLifeServer  -lpthread.h 
