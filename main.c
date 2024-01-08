@@ -100,8 +100,6 @@ _Bool send_world_state_to_client(struct char_buffer* buf, struct active_socket* 
                 char_buffer_append(&buffer, &world_state_character, 1);
             }
 
-            char terminate_character = '\0';
-            char_buffer_append(&buffer, &terminate_character, 1);
             active_socket_write_data(client_sock, &buffer);
             fclose(world_state_file);
             return true;
