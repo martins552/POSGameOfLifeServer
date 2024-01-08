@@ -18,7 +18,7 @@ typedef struct world_state {
     char* world;
 } WORLD_STATE_DATA;
 
-_Bool world_state_try_deserialize(struct world_state* worldState, struct char_buffer* buf) {
+_Bool world_state_try_deserialize(struct char_buffer* buf) {
     char* delimiter_position = strchr(buf->data, '\n');
     if(delimiter_position != NULL)
     {
@@ -40,6 +40,7 @@ _Bool world_state_try_deserialize(struct world_state* worldState, struct char_bu
                 int line_length = (int)(delimiter_position - previous_delimiter_position);
                 char string_to_write[line_length + 1];
                 strncpy(string_to_write, previous_delimiter_position + 1, line_length);
+                string_to_write[line_length] = '\0';
                 fprintf(world_state_file, "%s", string_to_write);
 
                 previous_delimiter_position = delimiter_position;
@@ -79,6 +80,9 @@ _Bool send_world_state_to_client(struct char_buffer* buf, struct active_socket* 
                 char world_state_character = fgetc(world_state_file);
                 char_buffer_append(&buffer, &world_state_character, 1);
             }
+
+            char terminate_character = '\0';
+            char_buffer_append(&buffer, &terminate_character, 1);
             active_socket_write_data(client_sock, &buffer);
             active_socket_write_end_message(client_sock);
             fclose(world_state_file);
@@ -88,11 +92,11 @@ _Bool send_world_state_to_client(struct char_buffer* buf, struct active_socket* 
     return false;
 }
 
-_Bool determine_client_input(struct world_state* worldState, struct char_buffer* buf, struct active_socket* client_sock) {
+_Bool determine_client_input(struct char_buffer* buf, struct active_socket* client_sock) {
     char determinant = buf->data[0];
     if(determinant == 'r')
     {
-        return world_state_try_deserialize(worldState, buf);
+        return world_state_try_deserialize(buf);
     } else if(determinant == 'w')
     {
         return send_world_state_to_client(buf, client_sock);
@@ -103,7 +107,7 @@ _Bool determine_client_input(struct world_state* worldState, struct char_buffer*
     return false;
 }
 
-_Bool try_get_client_(struct active_socket* my_sock, struct pi_estimation* client_pi_estimaton) {
+_Bool try_get_client(struct active_socket* my_sock, struct pi_estimation* client_pi_estimaton) {
     _Bool result = false;
     CHAR_BUFFER r_buf;
     char_buffer_init(&r_buf);
@@ -112,7 +116,7 @@ _Bool try_get_client_(struct active_socket* my_sock, struct pi_estimation* clien
         if(r_buf.size > 0) {
             if(active_socket_is_end_message(my_sock, &r_buf)) {
                 active_socket_stop_reading(my_sock);
-            } else if (pi_estimation_try_deserialize(client_pi_estimaton, &r_buf)) {
+            } else if (world_state_try_deserialize(&r_buf)) {
                 result = true;
             } else {
                 printf("Klient poslal spravu v zlom formate\ndata: %s\n", r_buf.data);
